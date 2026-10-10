@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #f4f6f8;
+  --ink: #17231f;
+  --muted: #718078;
+  --green: #176c4a;
+  --green-dark: #0e4d35;
+  --line: #e4eae6;
+  --white: #fff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'DM Sans', sans-serif; }
+a { color: inherit; }
+.page-shell { max-width: 1200px; margin: 0 auto; padding: 0 34px; }
+.topbar { height: 82px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e3e9e5; }
+.brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; font-size: 12px; letter-spacing: 1.4px; font-weight: 700; }
+.brand b { color: var(--green); }
+.brand-mark { width: 39px; height: 35px; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--green); font: 800 12px 'Manrope', sans-serif; letter-spacing: -.5px; }
+.status { display: flex; align-items: center; gap: 8px; color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: 1.3px; background: #e4f2e9; padding: 10px 13px; border-radius: 99px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #3da56e; box-shadow: 0 0 0 4px #cce8d7; }
+.hero { display: grid; grid-template-columns: 1.1fr .9fr; min-height: 355px; align-items: center; position: relative; overflow: hidden; }
+.hero-copy { padding: 55px 0 53px; z-index: 1; }
+.eyebrow { color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: 1.8px; margin: 0 0 13px; }
+.eyebrow-line { display: inline-block; width: 22px; height: 2px; background: var(--green); vertical-align: middle; margin-right: 8px; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { font: 800 clamp(35px, 4.4vw, 56px)/1.08 'Manrope', sans-serif; letter-spacing: -2.5px; margin-bottom: 20px; }
+h1 span { color: var(--green); }
+.hero-description { max-width: 510px; color: #64736b; font-size: 14px; line-height: 1.8; margin-bottom: 20px; }
+.updated { color: #7d8983; font-size: 11px; display: flex; align-items: center; gap: 8px; }
+.calendar-icon { color: var(--green); font-size: 18px; }
+.hero-art { height: 300px; position: relative; display: flex; align-items: center; justify-content: center; }
+.art-orbit { position: absolute; border: 1px solid #d5e5da; border-radius: 50%; transform: rotate(-25deg); }
+.orbit-one { width: 310px; height: 210px; }
+.orbit-two { width: 240px; height: 300px; transform: rotate(35deg); }
+.fuel-drop { width: 125px; height: 155px; background: linear-gradient(145deg, #2e8c63, #0e573a); border-radius: 72% 28% 62% 38% / 62% 30% 70% 38%; transform: rotate(45deg); box-shadow: 18px 22px 45px #155c3c2b; position: relative; z-index: 1; }
+.drop-shine { position: absolute; width: 22px; height: 58px; background: #ffffff52; border-radius: 100%; top: 24px; left: 29px; transform: rotate(9deg); }
+.art-label { position: absolute; z-index: 2; right: 2%; bottom: 35px; padding: 17px 20px; border: 1px solid #e1eae4; border-radius: 13px; background: #ffffffdc; box-shadow: 0 12px 32px #234b3210; display: grid; gap: 5px; font-size: 11px; }
+.art-label span { color: #829188; font-weight: 800; letter-spacing: 2px; font-size: 9px; }
+.art-label strong { color: var(--green); font-size: 13px; }
+.section-heading { display: flex; justify-content: space-between; align-items: end; margin: 6px 0 20px; }
+.section-heading h2, .calculator h2 { font: 800 24px 'Manrope', sans-serif; letter-spacing: -.7px; margin: 0; }
+.unit-note { color: #87928c; font-size: 11px; padding-bottom: 4px; }
+.fuel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; }
+.fuel-card { background: var(--white); border: 1px solid #e8eeea; border-radius: 17px; padding: 23px 22px 18px; box-shadow: 0 6px 20px #263d3005; min-width: 0; }
+.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.fuel-icon { display: grid; place-items: center; height: 39px; min-width: 43px; padding: 0 9px; border-radius: 12px; background: #e6f3eb; color: var(--green); font: 800 12px 'Manrope', sans-serif; }
+.violet .fuel-icon { background: #efebfb; color: #7158b7; }
+.amber .fuel-icon { background: #fff1db; color: #ad7119; }
+.fuel-type { color: #a0aaa4; font-size: 10px; letter-spacing: 1.4px; font-weight: 800; }
+.fuel-card h3 { font: 700 15px 'Manrope', sans-serif; margin-bottom: 18px; }
+.muted-label { color: #89958e; font-size: 11px; margin-bottom: 5px; }
+.price-current { font: 800 32px 'Manrope', sans-serif; letter-spacing: -1px; color: #1c2d24; }
+.price-current small, .price-estimate small { font: 500 12px 'DM Sans', sans-serif; color: #849189; margin-left: 4px; }
+.price-divider { height: 1px; background: #edf0ee; margin: 18px 0 16px; }
+.price-estimate { font: 800 24px 'Manrope', sans-serif; letter-spacing: -.6px; color: #7a8580; }
+.saving-pill { margin-top: 14px; display: inline-flex; gap: 7px; align-items: center; border-radius: 7px; padding: 8px 10px; background: #e8f5ec; color: #19704b; font-size: 11px; font-weight: 700; }
+.saving-pill span { font-size: 14px; }
+.edit-price { display: block; margin-top: 19px; padding-top: 14px; border-top: 1px solid #edf0ee; }
+.edit-price > span, .litres-input > span { display: block; color: #87928c; font-size: 10px; margin-bottom: 7px; }
+.input-wrap { display: flex; justify-content: space-between; align-items: center; background: #f7f9f8; border: 1px solid #e6ece8; border-radius: 8px; padding: 0 11px; }
+.input-wrap input { border: 0; outline: none; background: transparent; color: var(--ink); width: 100%; min-width: 0; padding: 10px 0; font: 700 13px 'DM Sans', sans-serif; }
+.input-wrap span { font-size: 10px; color: #8c9891; white-space: nowrap; }
+.calculator { margin-top: 26px; padding: 25px 25px 20px; border-radius: 18px; background: #143e2d; color: #fff; box-shadow: 0 12px 35px #173f2c12; }
+.calculator-heading { display: flex; align-items: center; gap: 13px; }
+.calc-icon { width: 43px; height: 43px; display: grid; place-items: center; border-radius: 12px; background: #2b5c45; color: #bce5cb; font-size: 24px; }
+.calculator .eyebrow { color: #a8d8b9; margin-bottom: 5px; font-size: 9px; }
+.calculator h2 { color: #fff; font-size: 21px; }
+.calculator-body { display: grid; grid-template-columns: .7fr 1.3fr; gap: 20px; align-items: center; margin-top: 25px; }
+.litres-input > span { color: #b8cfc1; font-size: 11px; }
+.big-input { background: #214d39; border-color: #39644f; max-width: 260px; }
+.big-input input { color: white; font-size: 18px; padding: 13px 0; }
+.big-input span { color: #b8cfc1; }
+.calc-result { border-left: 1px solid #426653; padding-left: 25px; display: grid; gap: 5px; }
+.calc-result span { color: #c1d5c8; font-size: 11px; }
+.calc-result strong { color: #bce8c9; font: 800 34px 'Manrope', sans-serif; letter-spacing: -1px; }
+.calc-result small { color: #8fb39d; font-size: 10px; }
+.tank-breakdown { margin-top: 24px; border-top: 1px solid #3c604c; padding-top: 13px; }
+.tank-row { display: grid; grid-template-columns: 8px 1fr 90px 18px 110px 95px; align-items: center; gap: 9px; padding: 10px 0; border-bottom: 1px solid #2c503d; font-size: 11px; }
+.mini-dot { width: 7px; height: 7px; border-radius: 50%; background: #66bd89; }
+.mini-dot.violet { background: #b8a3f4; }
+.mini-dot.amber { background: #e7b664; }
+.tank-name { color: #e4eee7; }
+.tank-price { text-align: right; color: #d8e6dd; font-weight: 600; }
+.tank-price.alt { color: #a4b8ac; }
+.tank-arrow { text-align: center; color: #81a18d; }
+.tank-diff { text-align: right; color: #bce8c9; font-weight: 700; }
+.tank-legend { display: flex; justify-content: flex-end; gap: 14px; color: #92ad9d; font-size: 9px; padding-top: 10px; }
+.method { display: flex; gap: 14px; margin: 22px 0 36px; padding: 20px 21px; background: #eaf0ec; border: 1px solid #e0e8e2; border-radius: 13px; }
+.method-icon { flex: 0 0 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; color: #3d7757; background: #d4e6d9; font-weight: 800; font-size: 12px; }
+.method h3 { font: 700 13px 'Manrope', sans-serif; margin-bottom: 7px; }
+.method p { color: #66766c; font-size: 11px; line-height: 1.7; margin-bottom: 6px; }
+.method .disclaimer { color: #859188; margin-bottom: 0; }
+.footer { border-top: 1px solid #e1e8e3; padding: 22px 0 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.footer-brand { font-size: 10px; }
+.footer-brand .brand-mark { width: 32px; height: 29px; border-radius: 8px; font-size: 10px; }
+.footer-meta { display: flex; align-items: center; gap: 18px; color: #89958e; font-size: 10px; }
+.footer-meta a { color: var(--green); text-decoration: none; font-weight: 700; white-space: nowrap; }
+@media (max-width: 800px) {
+  .page-shell { padding: 0 20px; }
+  .hero { grid-template-columns: 1fr .55fr; min-height: 310px; }
+  .hero-art { transform: scale(.8); margin-left: -30px; }
+  .fuel-grid { gap: 10px; }
+  .fuel-card { padding: 18px 14px 14px; }
+  .price-current { font-size: 27px; }
+  .price-estimate { font-size: 21px; }
+  .tank-row { grid-template-columns: 8px 1fr 75px 14px 90px 80px; gap: 6px; }
+}
+@media (max-width: 600px) {
+  .page-shell { padding: 0 15px; }
+  .topbar { height: 68px; }
+  .brand { font-size: 10px; letter-spacing: .8px; gap: 8px; }
+  .brand-mark { width: 34px; height: 32px; }
+  .status { font-size: 8px; padding: 8px 9px; letter-spacing: .7px; }
+  .hero { display: block; min-height: auto; }
+  .hero-copy { padding: 42px 0 27px; }
+  h1 { font-size: 39px; letter-spacing: -1.8px; }
+  .hero-description { font-size: 13px; }
+  .hero-art { display: none; }
+  .section-heading { align-items: start; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .section-heading h2 { font-size: 22px; }
+  .fuel-grid { grid-template-columns: 1fr; gap: 12px; }
+  .fuel-card { padding: 19px; }
+  .price-current { font-size: 32px; }
+  .price-estimate { font-size: 24px; }
+  .calculator { padding: 20px 16px 16px; }
+  .calculator h2 { font-size: 17px; }
+  .calculator-body { grid-template-columns: 1fr; gap: 19px; }
+  .calc-result { border-left: 0; border-top: 1px solid #426653; padding: 17px 0 0; }
+  .calc-result strong { font-size: 31px; }
+  .tank-row { grid-template-columns: 7px 1fr auto; gap: 8px; }
+  .tank-arrow { display: none; }
+  .tank-price { display: none; }
+  .tank-price.alt { display: none; }
+  .tank-diff { grid-column: 3; }
+  .tank-legend { justify-content: flex-start; }
+  .footer { align-items: flex-start; flex-direction: column; }
+  .footer-meta { align-items: flex-start; flex-direction: column; gap: 8px; line-height: 1.5; }
+}

@@ -1,3 +1,4 @@
+
 {
   "name": "ceny-paliwa-cpn",
   "version": "1.0.0",
@@ -9,15 +10,15 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "15.5.4",
-    "react": "19.1.1",
-    "react-dom": "19.1.1"
+    "next": "15.5.27",
+    "react": "19.1.7",
+    "react-dom": "19.1.7"
   },
   "devDependencies": {
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.8",
     "eslint": "^9.34.0",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "15.5.27",
     "typescript": "^5.9.2"
   }
 }

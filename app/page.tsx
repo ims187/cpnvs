@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { estimateWithoutRelief, money, priceSnapshot } from "@/lib/prices";
+import Promotions from "@/components/Promotions";
 
 type FuelId = "pb95" | "pb98" | "diesel";
 
@@ -373,6 +374,8 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      <Promotions />
 
       <footer className="footer">
         <div className="brand footer-brand">

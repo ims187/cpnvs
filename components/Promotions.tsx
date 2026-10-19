@@ -1,7 +1,6 @@
  "use client";
 
 import { useMemo, useState } from "react";
-import "./promotions.css";
 
 type Promotion = {
   id: string;

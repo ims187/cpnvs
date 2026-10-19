@@ -1,14 +1,12 @@
-# CPNVS — zintegrowana sekcja promocji
+# CPNVS — kompletny projekt
 
-## Pliki do wgrania do repozytorium
+## Uruchomienie
+1. Rozpakuj archiwum.
+2. W katalogu projektu uruchom `npm install`.
+3. `npm run dev` uruchamia wersję lokalną; `npm run build` sprawdza kompilację.
 
-- `app/page.tsx` — Twoja aktualna strona z dodanym komponentem promocji; pozostawiono pobieranie cen przez `/api/prices`.
-- `app/layout.tsx` — dodany import `promotions.css` i opis aplikacji.
-- `app/promotions.css` — style nowej sekcji.
-- `components/Promotions.tsx` — karty i filtry sieci paliwowych.
+## Wdrożenie
+Wgraj zawartość katalogu projektu do repozytorium GitHub, zatwierdź zmiany na gałęzi `main` i sprawdź logi deploymentu w Vercel.
 
-## Jak wdrożyć
-
-Skopiuj te cztery pliki do odpowiadających im lokalizacji w repozytorium GitHub, zatwierdź zmiany na `main` i poczekaj na deployment Vercel.
-
-Wszystkie kwoty oznaczone jako „Przykład” są demonstracyjne, nie są potwierdzeniem aktualnych promocji.
+## Ważne
+Karty promocji są przykładami układu i nie potwierdzają aktywnych rabatów. Ceny z `lib/prices.ts` są awaryjnym fallbackiem, gdy źródło cen nie odpowiada.

@@ -1,26 +1,131 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { estimateWithoutRelief, money, priceSnapshot } from "@/lib/prices";
+
+type FuelId = "pb95" | "pb98" | "diesel";
+
+type ApiResponse = {
+  updatedAt: string;
+  fallback: boolean;
+  error?: string;
+  prices: { id: FuelId; current: number }[];
+};
 
 export default function Home() {
   const [litres, setLitres] = useState("50");
   const [prices, setPrices] = useState<Record<string, string>>(
-    Object.fromEntries(priceSnapshot.prices.map((p) => [p.id, p.current.toFixed(2)]))
+    Object.fromEntries(
+      priceSnapshot.prices.map((p) => [p.id, p.current.toFixed(2)])
+    )
+  );
+  const [updatedAt, setUpdatedAt] = useState(priceSnapshot.updatedAt);
+  const [loading, setLoading] = useState(true);
+  const [sourceError, setSourceError] = useState("");
+
+  const refreshPrices = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/prices", {
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error(`API zwróciło HTTP ${response.status}`);
+      }
+
+      const data = (await response.json()) as ApiResponse;
+
+      if (!Array.isArray(data.prices)) {
+        throw new Error("Nieprawidłowa odpowiedź API.");
+      }
+
+      const requiredIds: FuelId[] = ["pb95", "pb98", "diesel"];
+      const newPrices: Record<string, string> = {};
+
+      for (const id of requiredIds) {
+        const item = data.prices.find((p) => p.id === id);
+
+        if (
+          !item ||
+          !Number.isFinite(item.current) ||
+          item.current < 3 ||
+          item.current > 15
+        ) {
+          throw new Error(`Brak prawidłowej ceny dla ${id}.`);
+        }
+
+        newPrices[id] = item.current.toFixed(2);
+      }
+
+      if (data.fallback) {
+        setSourceError(
+          `Źródło nie zwróciło świeżych danych. ${data.error ?? "Pokazano ceny awaryjne."}`
+        );
+      } else {
+        setSourceError("");
+      }
+
+      setPrices((old) => ({ ...old, ...newPrices }));
+      setUpdatedAt(data.updatedAt);
+    } catch (error) {
+      setSourceError(
+        error instanceof Error
+          ? error.message
+          : "Nie udało się pobrać cen."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshPrices();
+
+    const timer = window.setInterval(() => {
+      void refreshPrices();
+    }, 15 * 60 * 1000);
+
+    return () => window.clearInterval(timer);
+  }, [refreshPrices]);
+
+  const results = useMemo(
+    () =>
+      priceSnapshot.prices.map((fuel) => {
+        const current = Math.max(0, Number(prices[fuel.id]) || 0);
+        const without = estimateWithoutRelief(
+          current,
+          fuel.exciseReduction
+        );
+        const saving = Math.max(0, without - current);
+        const amount = Math.max(0, Number(litres) || 0);
+
+        return {
+          ...fuel,
+          current,
+          without,
+          saving,
+          tankSaving: saving * amount,
+          tankCurrent: current * amount,
+          tankWithout: without * amount,
+        };
+      }),
+    [litres, prices]
   );
 
-  const results = useMemo(() => priceSnapshot.prices.map((fuel) => {
-    const current = Math.max(0, Number(prices[fuel.id]) || 0);
-    const without = estimateWithoutRelief(current, fuel.exciseReduction);
-    const saving = Math.max(0, without - current);
-    const amount = Math.max(0, Number(litres) || 0);
-    return { ...fuel, current, without, saving, tankSaving: saving * amount, tankCurrent: current * amount, tankWithout: without * amount };
-  }), [litres, prices]);
+  const totalSaving = results.reduce(
+    (sum, item) => sum + item.tankSaving,
+    0
+  );
 
-  const totalSaving = results.reduce((sum, item) => sum + item.tankSaving, 0);
-  const formattedDate = new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "long", year: "numeric" })
-    .format(new Date(`${priceSnapshot.updatedAt}T12:00:00`));
+  const formattedDate = new Intl.DateTimeFormat("pl-PL", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${updatedAt}T12:00:00Z`));
 
   return (
     <main className="page-shell">
@@ -40,8 +145,35 @@ export default function Home() {
             Zobacz aktualne ceny maksymalne i porównaj je z szacunkiem ceny,
             która mogłaby obowiązywać bez obniżonego VAT-u i akcyzy.
           </p>
-          <div className="updated"><span className="calendar-icon">↻</span> Dane cenowe: {formattedDate}</div>
+
+          <div className="updated">
+            <span className="calendar-icon">↻</span>
+            Dane cenowe: {formattedDate}
+            <button
+              type="button"
+              onClick={() => void refreshPrices()}
+              disabled={loading}
+              style={{
+                marginLeft: 12,
+                padding: "6px 10px",
+                borderRadius: 8,
+                border: "1px solid currentColor",
+                background: "transparent",
+                color: "inherit",
+                cursor: loading ? "wait" : "pointer",
+              }}
+            >
+              {loading ? "Odświeżam..." : "Odśwież ceny"}
+            </button>
+          </div>
+
+          {sourceError && (
+            <p role="alert" style={{ color: "#c2410c", fontSize: 13 }}>
+              {sourceError}
+            </p>
+          )}
         </div>
+
         <div className="hero-art" aria-hidden="true">
           <div className="art-orbit orbit-one" />
           <div className="art-orbit orbit-two" />
@@ -81,7 +213,9 @@ export default function Home() {
                   min="0"
                   step="0.01"
                   value={prices[fuel.id]}
-                  onChange={(event) => setPrices((old) => ({ ...old, [fuel.id]: event.target.value }))}
+                  onChange={(event) =>
+                    setPrices((old) => ({ ...old, [fuel.id]: event.target.value }))
+                  }
                 />
                 <span>zł/l</span>
               </div>
@@ -99,7 +233,15 @@ export default function Home() {
           <label className="litres-input">
             <span>Ile litrów tankujesz?</span>
             <div className="input-wrap big-input">
-              <input aria-label="Liczba litrów" type="number" min="0" max="5000" step="1" value={litres} onChange={(event) => setLitres(event.target.value)} />
+              <input
+                aria-label="Liczba litrów"
+                type="number"
+                min="0"
+                max="5000"
+                step="1"
+                value={litres}
+                onChange={(event) => setLitres(event.target.value)}
+              />
               <span>litrów</span>
             </div>
           </label>

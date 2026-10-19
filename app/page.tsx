@@ -15,12 +15,18 @@ type ApiResponse = {
 
 export default function Home() {
   const [litres, setLitres] = useState("50");
+
   const [prices, setPrices] = useState<Record<string, string>>(
     Object.fromEntries(
       priceSnapshot.prices.map((p) => [p.id, p.current.toFixed(2)])
     )
   );
-  const [updatedAt, setUpdatedAt] = useState(priceSnapshot.updatedAt);
+
+  // Jawny typ string naprawia błąd kompilacji TypeScript.
+  const [updatedAt, setUpdatedAt] = useState<string>(
+    priceSnapshot.updatedAt
+  );
+
   const [loading, setLoading] = useState(true);
   const [sourceError, setSourceError] = useState("");
 
@@ -60,16 +66,18 @@ export default function Home() {
         newPrices[id] = item.current.toFixed(2);
       }
 
+      setPrices((old) => ({ ...old, ...newPrices }));
+      setUpdatedAt(data.updatedAt);
+
       if (data.fallback) {
         setSourceError(
-          `Źródło nie zwróciło świeżych danych. ${data.error ?? "Pokazano ceny awaryjne."}`
+          `Nie udało się pobrać aktualnych danych. ${
+            data.error ?? "Wyświetlane są ceny awaryjne."
+          }`
         );
       } else {
         setSourceError("");
       }
-
-      setPrices((old) => ({ ...old, ...newPrices }));
-      setUpdatedAt(data.updatedAt);
     } catch (error) {
       setSourceError(
         error instanceof Error
@@ -95,10 +103,12 @@ export default function Home() {
     () =>
       priceSnapshot.prices.map((fuel) => {
         const current = Math.max(0, Number(prices[fuel.id]) || 0);
+
         const without = estimateWithoutRelief(
           current,
           fuel.exciseReduction
         );
+
         const saving = Math.max(0, without - current);
         const amount = Math.max(0, Number(litres) || 0);
 
@@ -120,27 +130,46 @@ export default function Home() {
     0
   );
 
-  const formattedDate = new Intl.DateTimeFormat("pl-PL", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${updatedAt}T12:00:00Z`));
+  const formattedDate = /^\d{4}-\d{2}-\d{2}$/.test(updatedAt)
+    ? new Intl.DateTimeFormat("pl-PL", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(`${updatedAt}T12:00:00Z`))
+    : "brak danych";
 
   return (
     <main className="page-shell">
       <nav className="topbar">
-        <a className="brand" href="#" aria-label="Ceny Paliwa Niżej — strona główna">
+        <a
+          className="brand"
+          href="#"
+          aria-label="Ceny Paliwa Niżej — strona główna"
+        >
           <span className="brand-mark">CPN</span>
-          <span>CENY PALIWA <b>NIŻEJ</b></span>
+          <span>
+            CENY PALIWA <b>NIŻEJ</b>
+          </span>
         </a>
-        <span className="status"><span className="status-dot" /> PROGRAM CPN</span>
+
+        <span className="status">
+          <span className="status-dot" /> PROGRAM CPN
+        </span>
       </nav>
 
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow"><span className="eyebrow-line" /> POLICZ RÓŻNICĘ</p>
-          <h1>Ile płacisz za paliwo,<br /><span>a ile bez obniżki?</span></h1>
+          <p className="eyebrow">
+            <span className="eyebrow-line" /> POLICZ RÓŻNICĘ
+          </p>
+
+          <h1>
+            Ile płacisz za paliwo,
+            <br />
+            <span>a ile bez obniżki?</span>
+          </h1>
+
           <p className="hero-description">
             Zobacz aktualne ceny maksymalne i porównaj je z szacunkiem ceny,
             która mogłaby obowiązywać bez obniżonego VAT-u i akcyzy.
@@ -149,6 +178,7 @@ export default function Home() {
           <div className="updated">
             <span className="calendar-icon">↻</span>
             Dane cenowe: {formattedDate}
+
             <button
               type="button"
               onClick={() => void refreshPrices()}
@@ -168,7 +198,14 @@ export default function Home() {
           </div>
 
           {sourceError && (
-            <p role="alert" style={{ color: "#c2410c", fontSize: 13 }}>
+            <p
+              role="alert"
+              style={{
+                color: "#c2410c",
+                fontSize: 13,
+                marginTop: 8,
+              }}
+            >
               {sourceError}
             </p>
           )}
@@ -177,8 +214,14 @@ export default function Home() {
         <div className="hero-art" aria-hidden="true">
           <div className="art-orbit orbit-one" />
           <div className="art-orbit orbit-two" />
-          <div className="fuel-drop"><div className="drop-shine" /></div>
-          <div className="art-label"><span>CPN</span><strong>− VAT</strong><strong>− AKCYZA</strong></div>
+          <div className="fuel-drop">
+            <div className="drop-shine" />
+          </div>
+          <div className="art-label">
+            <span>CPN</span>
+            <strong>− VAT</strong>
+            <strong>− AKCYZA</strong>
+          </div>
         </div>
       </section>
 
@@ -192,20 +235,42 @@ export default function Home() {
 
       <section className="fuel-grid">
         {results.map((fuel) => (
-          <article className={`fuel-card ${fuel.tone}`} key={fuel.id}>
+          <article
+            className={`fuel-card ${fuel.tone}`}
+            key={fuel.id}
+          >
             <div className="card-top">
               <div className="fuel-icon">{fuel.icon}</div>
               <span className="fuel-type">{fuel.short}</span>
             </div>
+
             <h3>{fuel.name}</h3>
-            <p className="muted-label">Cena maksymalna z programem</p>
-            <div className="price-current">{money(fuel.current)}<small>/l</small></div>
+
+            <p className="muted-label">
+              Cena maksymalna z programem
+            </p>
+
+            <div className="price-current">
+              {money(fuel.current)}
+              <small>/l</small>
+            </div>
+
             <div className="price-divider" />
+
             <p className="muted-label">Szacunek bez obniżki</p>
-            <div className="price-estimate">{money(fuel.without)}<small>/l</small></div>
-            <div className="saving-pill"><span>↓</span> Oszczędzasz {money(fuel.saving)}/l</div>
+
+            <div className="price-estimate">
+              {money(fuel.without)}
+              <small>/l</small>
+            </div>
+
+            <div className="saving-pill">
+              <span>↓</span> Oszczędzasz {money(fuel.saving)}/l
+            </div>
+
             <label className="edit-price">
               <span>Edytuj cenę aktualną</span>
+
               <div className="input-wrap">
                 <input
                   aria-label={`Aktualna cena ${fuel.name}`}
@@ -214,7 +279,10 @@ export default function Home() {
                   step="0.01"
                   value={prices[fuel.id]}
                   onChange={(event) =>
-                    setPrices((old) => ({ ...old, [fuel.id]: event.target.value }))
+                    setPrices((old) => ({
+                      ...old,
+                      [fuel.id]: event.target.value,
+                    }))
                   }
                 />
                 <span>zł/l</span>
@@ -227,11 +295,17 @@ export default function Home() {
       <section className="calculator">
         <div className="calculator-heading">
           <div className="calc-icon">↗</div>
-          <div><p className="eyebrow">KALKULATOR TANKOWANIA</p><h2>Ile zostaje w kieszeni?</h2></div>
+
+          <div>
+            <p className="eyebrow">KALKULATOR TANKOWANIA</p>
+            <h2>Ile zostaje w kieszeni?</h2>
+          </div>
         </div>
+
         <div className="calculator-body">
           <label className="litres-input">
             <span>Ile litrów tankujesz?</span>
+
             <div className="input-wrap big-input">
               <input
                 aria-label="Liczba litrów"
@@ -245,12 +319,17 @@ export default function Home() {
               <span>litrów</span>
             </div>
           </label>
+
           <div className="calc-result">
             <span>Szacowana różnica przy tankowaniu</span>
             <strong>{money(totalSaving)}</strong>
-            <small>dla {Math.max(0, Number(litres) || 0)} litrów wybranego zestawu paliw</small>
+            <small>
+              dla {Math.max(0, Number(litres) || 0)} litrów wybranego zestawu
+              paliw
+            </small>
           </div>
         </div>
+
         <div className="tank-breakdown">
           {results.map((fuel) => (
             <div className="tank-row" key={fuel.id}>
@@ -258,23 +337,35 @@ export default function Home() {
               <span className="tank-name">{fuel.name}</span>
               <span className="tank-price">{money(fuel.tankCurrent)}</span>
               <span className="tank-arrow">→</span>
-              <span className="tank-price alt">{money(fuel.tankWithout)}</span>
-              <span className="tank-diff">+{money(fuel.tankSaving)}</span>
+              <span className="tank-price alt">
+                {money(fuel.tankWithout)}
+              </span>
+              <span className="tank-diff">
+                +{money(fuel.tankSaving)}
+              </span>
             </div>
           ))}
-          <div className="tank-legend"><span>Teraz</span><span>Bez obniżki — szacunek</span><span>Różnica</span></div>
+
+          <div className="tank-legend">
+            <span>Teraz</span>
+            <span>Bez obniżki — szacunek</span>
+            <span>Różnica</span>
+          </div>
         </div>
       </section>
 
       <section className="method">
         <div className="method-icon">i</div>
+
         <div>
           <h3>Jak obliczamy cenę bez obniżki?</h3>
+
           <p>
             Szacunek przywraca VAT z 8% do 23% oraz dolicza obniżoną akcyzę
-            (29 gr/l dla benzyny, 28 gr/l dla diesla). Zakładamy, że cena paliwa
-            przed podatkami pozostaje bez zmian.
+            (29 gr/l dla benzyny, 28 gr/l dla diesla). Zakładamy, że cena
+            paliwa przed podatkami pozostaje bez zmian.
           </p>
+
           <p className="disclaimer">
             To wyliczenie orientacyjne, a nie oficjalna cena kontrfaktyczna.
             Rzeczywista cena bez programu mogłaby się różnić m.in. przez zmianę
@@ -284,10 +375,24 @@ export default function Home() {
       </section>
 
       <footer className="footer">
-        <div className="brand footer-brand"><span className="brand-mark">CPN</span><span>CENY PALIWA <b>NIŻEJ</b></span></div>
+        <div className="brand footer-brand">
+          <span className="brand-mark">CPN</span>
+          <span>
+            CENY PALIWA <b>NIŻEJ</b>
+          </span>
+        </div>
+
         <div className="footer-meta">
-          <span>Projekt informacyjny, niezależny od administracji publicznej.</span>
-          <a href={priceSnapshot.sourceUrl} target="_blank" rel="noreferrer">Źródło danych ↗</a>
+          <span>
+            Projekt informacyjny, niezależny od administracji publicznej.
+          </span>
+          <a
+            href={priceSnapshot.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Źródło danych ↗
+          </a>
         </div>
       </footer>
     </main>
